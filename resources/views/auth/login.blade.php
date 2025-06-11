@@ -1,5 +1,14 @@
 <x-authentication-layout>
-    <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-bold mb-6">{{ __('Welcome back!') }}</h1>
+    <div class="flex items-center justify-between mt-1 pb-8 mb-6 border-b border-gray-100 dark:border-gray-700/60">
+        <!-- Logo -->
+            <a class="block" href="{{ route('dashboard') }}">
+                <img class="pt-1" width="132" src="{{ asset('images/logo_damu1.png') }}" alt="Logo Daarul Multazam">
+            </a>
+            <a class="block" href="{{ route('dashboard') }}">
+                <span class="hidden lg:block lg:sidebar-expanded:hidden 2xl:hidden" aria-hidden="true"></span>
+                <p class="lg:hidden lg:sidebar-expanded:block 2xl:block"><b class="block text-xl dark:text-gray-100">DONASI <span class="text-damu-500">Online</span></b><span class=" dark:text-gray-300 text-xxs block"><b><i>Daarul Multazam</i></b></span></p>
+            </a>  
+    </div>
     @if (session('status'))
         <div class="mb-4 font-medium text-sm text-green-600">
             {{ session('status') }}
@@ -38,7 +47,7 @@
         </div>
     </form>
     <x-validation-errors class="mt-4" />   
-    <!-- Footer -->
+    {{-- <!-- Footer -->
     <div class="pt-5 mt-6 border-t border-gray-100 dark:border-gray-700/60">
         <div class="text-sm">
             {{ __('Don\'t you have an account?') }} <a class="font-medium text-violet-500 hover:text-violet-600 dark:hover:text-violet-400" href="{{ route('register') }}">{{ __('Sign Up') }}</a>
@@ -53,6 +62,6 @@
                     To support you during the pandemic super pro features are free until March 31st.
                 </span>
             </div>
-        </div>
+        </div> --}}
     </div>
 </x-authentication-layout>
