@@ -2,7 +2,7 @@
     <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
 
         {{-- Menggunakan warna latar belakang 'damu' --}}
-        <div class="relative bg-damu-200 dark:bg-damu-900/50 p-4 sm:p-6 rounded-sm overflow-hidden mb-8">
+        <div class="relative bg-damu-200 dark:bg-damu-500/20 p-4 sm:p-6 rounded-sm overflow-hidden mb-8">
 
             <div class="absolute right-0 top-0 -mt-4 mr-16 pointer-events-none hidden xl:block" aria-hidden="true">
                 <svg width="319" height="198" xmlns:xlink="http://www.w3.org/1999/xlink">

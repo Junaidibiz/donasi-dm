@@ -1,13 +1,25 @@
 <x-authentication-layout>
-    <div class="flex items-center justify-between mt-1 pb-8 mb-6 border-b border-gray-100 dark:border-gray-700/60">
-        <!-- Logo -->
-            <a class="block" href="{{ route('dashboard') }}">
-                <img class="pt-1" width="132" src="{{ asset('images/logo_damu1.png') }}" alt="Logo Daarul Multazam">
+    {{-- Bagian Header Logo --}}
+    <div class="pb-8 mb-6">
+        {{-- Grup untuk Logo dan Teks --}}
+        <div class="flex flex-col items-center">
+            
+            {{-- Logo --}}
+            <a class="block mb-4" href="{{ route('dashboard') }}">
+                <img width="132" src="{{ asset('images/logo_damu1.png') }}" alt="Logo Daarul Multazam">
             </a>
-            <a class="block" href="{{ route('dashboard') }}">
-                <span class="hidden lg:block lg:sidebar-expanded:hidden 2xl:hidden" aria-hidden="true"></span>
-                <p class="lg:hidden lg:sidebar-expanded:block 2xl:block"><b class="block text-xl dark:text-gray-100">DONASI <span class="text-damu-500">Online</span></b><span class=" dark:text-gray-300 text-xxs block"><b><i>Daarul Multazam</i></b></span></p>
-            </a>  
+            
+            {{-- Teks di bawah logo --}}
+            <div class="text-center">
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+                    DONASI <span class="text-damu-500 text-xl">Online</span>
+                </h1>
+                <p class="text-lg font-bold italic text-gray-500 dark:text-gray-300">
+                    Daarul Multazam
+                </p>
+            </div>
+            
+        </div>
     </div>
     @if (session('status'))
         <div class="mb-4 font-medium text-sm text-green-600">
