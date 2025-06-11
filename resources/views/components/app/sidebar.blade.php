@@ -61,10 +61,10 @@
                     </li>
                     {{-- Kategori --}}
                     <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(in_array(Request::segment(1), ['#'])){{ 'from-damu-500/[0.12] dark:from-damu-500/[0.24] to-damu-500/[0.04]' }}@endif">
-                        <a class="block text-gray-800 dark:text-gray-100 truncate transition @if(!in_array(Request::segment(1), ['#'])){{ 'hover:text-gray-900 dark:hover:text-white' }}@endif" href="#">
+                        <a class="block text-gray-800 dark:text-gray-100 truncate transition @if(!in_array(Request::segment(1), ['kategori'])){{ 'hover:text-gray-900 dark:hover:text-white' }}@endif" href="#">
                             <div class="flex items-center justify-between">
                                 <div class="grow flex items-center">
-                                    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" class="size-4.5 shrink-0 fill-transparan @if(in_array(Request::segment(1), ['#'])){{ 'stroke-damu-500' }}@else{{ 'stroke-gray-400 dark:stroke-gray-500' }}@endif" width="16" height="16">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" class="size-4.5 shrink-0 fill-transparan @if(in_array(Request::segment(1), ['#'])){{ 'stroke-damu-500' }}@else{{ 'stroke-gray-400 dark:stroke-gray-500' }}@endif" width="16" height="16">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 0 0-1.883 2.542l.857 6a2.25 2.25 0 0 0 2.227 1.932H19.05a2.25 2.25 0 0 0 2.227-1.932l.857-6a2.25 2.25 0 0 0-1.883-2.542m-16.5 0V6A2.25 2.25 0 0 1 6 3.75h3.879a1.5 1.5 0 0 1 1.06.44l2.122 2.12a1.5 1.5 0 0 0 1.06.44H18A2.25 2.25 0 0 1 20.25 9v.776" />
                                     </svg>
 
