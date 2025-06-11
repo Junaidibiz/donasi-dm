@@ -18,6 +18,12 @@
                 <x-input id="password" type="password" name="password" required autocomplete="current-password" />                
             </div>
         </div>
+        <div class="block mt-4">
+            <label for="remember" class="flex items-center">
+                <input id="remember" type="checkbox" class="form-checkbox" name="remember">
+                <span class="text-sm ml-2">Ingat saya</span>
+            </label>
+        </div>
         <div class="flex items-center justify-between mt-6">
             @if (Route::has('password.request'))
                 <div class="mr-1">
