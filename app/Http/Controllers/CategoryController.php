@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
@@ -42,23 +41,23 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-       $request->validate([
-           'image' => 'required|image|mimes:jpeg,jpg,png|max:2000',
-           'name'  => 'required|unique:categories' 
-       ]); 
+    $request->validate([
+        'image' => 'required|image|mimes:jpeg,jpg,png|max:2000',
+        'name'  => 'required|unique:categories' 
+    ]); 
 
-       //upload image
-       $image = $request->file('image');
-       $image->storeAs('categories', $image->hashName(), 'public');
+    //upload image
+    $image = $request->file('image');
+    $image->storeAs('categories', $image->hashName(), 'public');
 
-       //save to DB
-       $category = Category::create([
-           'image'  => $image->hashName(),
-           'name'   => $request->name,
-           'slug'   => Str::slug($request->name, '-')
-       ]);
+    //save to DB
+    $category = Category::create([
+        'image'  => $image->hashName(),
+        'name'   => $request->name,
+        'slug'   => Str::slug($request->name, '-')
+    ]);
 
-       if($category){
+    if($category){
             //redirect dengan pesan sukses
             return redirect()->route('pages.category.index')->with(['success' => 'Data Berhasil Disimpan!']);
         }else{
