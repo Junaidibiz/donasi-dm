@@ -20,19 +20,19 @@
         </div>
 
         {{-- Card --}}
-        <div class="bg-white dark:bg-gray-800 shadow-md rounded-md border border-gray-200 dark:border-gray-700/60 p-6">
+        {{-- Di sini perubahannya: rounded-md diubah menjadi rounded-xl --}}
+        <div class="bg-white dark:bg-gray-800 shadow-md rounded-xl border border-gray-200 dark:border-gray-700/60 p-6">
             
             {{-- Form --}}
             <form action="{{ route('category.update', $category->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                @method('PUT') {{-- Method wajib untuk proses update --}}
+                @method('PUT')
                 
                 <div class="space-y-4">
 
                     {{-- Nama Kategori --}}
                     <div>
                         <x-label for="name">Nama Kategori <span class="text-red-500">*</span></x-label>
-                        {{-- Nilai input diambil dari data lama ($category->name) --}}
                         <x-input type="text" name="name" id="name" class="w-full" value="{{ old('name', $category->name) }}" required />
                         @error('name')
                             <div class="text-xs mt-1 text-red-500">{{ $message }}</div>
@@ -42,8 +42,14 @@
                     {{-- Gambar --}}
                     <div>
                         <x-label for="image">Gambar (Opsional)</x-label>
+                        <div class="mt-2 mb-2">
+                            <img src="{{ $category->image }}" class="w-20 h-20 object-cover rounded-md">
+                        </div>
                         <x-input type="file" name="image" id="image" class="w-full" />
                         <div class="text-xs text-gray-500 mt-1">Kosongkan jika tidak ingin mengubah gambar.</div>
+                         @error('image')
+                            <div class="text-xs mt-1 text-red-500">{{ $message }}</div>
+                        @enderror
                     </div>
 
                 </div>

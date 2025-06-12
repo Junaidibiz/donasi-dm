@@ -20,7 +20,7 @@
         </div>
 
         {{-- Card --}}
-        <div class="bg-white dark:bg-gray-800 shadow-md rounded-md border border-gray-200 dark:border-gray-700/60 p-6">
+        <div class="bg-white dark:bg-gray-800 shadow-md rounded-xl border border-gray-200 dark:border-gray-700/60 p-6">
             
             {{-- Form --}}
             <form action="{{ route('category.store') }}" method="POST" enctype="multipart/form-data">

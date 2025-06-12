@@ -3,10 +3,13 @@
 
         {{-- Page header --}}
         <div class="sm:flex sm:justify-between sm:items-center mb-8">
+            
             <div class="mb-4 sm:mb-0">
                 <h1 class="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold">Donation Categories</h1>
             </div>
+
             <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
+                
                 <form class="relative" action="{{ route('category.index') }}" method="GET">
                     <input id="action-search" class="form-input w-full pl-9" type="search" name="q" value="{{ request()->query('q') }}" placeholder="Cari kategori..." />
                     <button class="absolute inset-0 right-auto group" type="submit" aria-label="Search">
@@ -15,18 +18,21 @@
                         </svg>
                     </button>
                 </form>
+                
                 <a href="{{ route('category.create') }}" class="btn bg-damu-500 hover:bg-damu-600 text-white">
                     <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16"><path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" /></svg>
                     <span class="hidden xs:block ml-2">Add Category</span>
                 </a>
+
             </div>
         </div>
 
-        {{-- Table --}}
-        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-sm border border-gray-200 dark:border-gray-700/60">
+        {{-- Table Card --}}
+        {{-- Di sini perubahannya: ditambahkan kelas overflow-hidden --}}
+        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-xl border border-gray-200 dark:border-gray-700/60 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="table-auto w-full dark:text-gray-300">
-                    <thead class="text-xs font-semibold uppercase text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-700/50">
+                    <thead class="text-xs font-semibold uppercase text-gray-50 dark:text-gray-500 bg-gray-700 dark:bg-gray-700/50">
                         <tr>
                             <th class="p-2 whitespace-nowrap"><div class="font-semibold text-center">GAMBAR</div></th>
                             <th class="p-2 whitespace-nowrap"><div class="font-semibold text-left">NAMA KATEGORI</div></th>
@@ -45,8 +51,6 @@
                                 <td class="p-2 whitespace-nowrap text-center">
                                     <a href="{{ route('category.edit', $category->id) }}" class="btn-sm bg-blue-500 hover:bg-blue-600 text-white">EDIT</a>
                                     <button onclick="destroy({{ $category->id }})" class="btn-sm bg-red-500 hover:bg-red-600 text-white">HAPUS</button>
-
-                                    {{-- <button onClick="destroy(this.id)" id="{{ $category->id }}" class="bg-red-600 px-4 py-2 rounded shadow-sm text-xs text-white focus:outline-none">HAPUS</button> --}}
                                 </td>
                             </tr>
                         @empty
@@ -58,40 +62,51 @@
         </div>
         
         <div class="mt-8">{{ $categories->links() }}</div>
+
     </div>
 
     @push('scripts')
+    {{-- ... Script Anda tidak perlu diubah ... --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
       function destroy(id) {
           var token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
           Swal.fire({
               title: 'APAKAH KAMU YAKIN ?',
               text: "INGIN MENGHAPUS DATA INI!",
               icon: 'warning',
               showCancelButton: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
-              cancelButtonText: 'BATAL',
+              confirmButtonColor: '#d33',
+              cancelButtonColor: '#3085d6',
               confirmButtonText: 'YA, HAPUS!',
-          }).then((result) => {
+              cancelButtonText: 'BATAL',
+          }).then(async (result) => {
               if (result.isConfirmed) {
-                  fetch(`/category/${id}`, { // URL Disesuaikan
-                      method: 'DELETE',
-                      headers: {
-                          'X-CSRF-TOKEN': token,
-                          'Content-Type': 'application/json'
+                  try {
+                      const response = await fetch(`/category/${id}`, {
+                          method: 'DELETE',
+                          headers: {
+                              'X-CSRF-TOKEN': token,
+                              'Content-Type': 'application/json'
+                          }
+                      });
+                      if (!response.ok) {
+                          throw new Error('Terjadi masalah pada server.');
                       }
-                  }).then(response => response.json())
-                    .then(data => {
+                      const data = await response.json();
                       if (data.status == "success") {
                           Swal.fire({ icon: 'success', title: 'BERHASIL!', text: 'DATA BERHASIL DIHAPUS!', showConfirmButton: false, timer: 2000 })
                           .then(() => location.reload());
                       } else {
                           Swal.fire({ icon: 'error', title: 'GAGAL!', text: 'DATA GAGAL DIHAPUS!', showConfirmButton: false, timer: 2000 });
                       }
-                  });
+                  } catch (error) {
+                      Swal.fire({
+                          icon: 'error',
+                          title: 'Oops...',
+                          text: 'Terjadi kesalahan! ' + error.message,
+                      });
+                  }
               }
           })
       }

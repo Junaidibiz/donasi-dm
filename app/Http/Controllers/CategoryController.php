@@ -5,14 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
     /**
-     * index
+     * Menampilkan daftar kategori.
      *
-     * @return void
+     * @return \Illuminate\View\View
      */
     public function index()
     {
@@ -20,70 +21,71 @@ class CategoryController extends Controller
             $categories = $categories->where('name', 'like', '%'. request()->q . '%');
         })->paginate(10);
 
+        // Menggunakan path view dari proyek kita
         return view('pages.category.index', compact('categories'));
     }
     
     /**
-     * create
+     * Menampilkan form untuk membuat kategori baru.
      *
-     * @return void
+     * @return \Illuminate\View\View
      */
     public function create()
     {
+        // Menggunakan path view dari proyek kita
         return view('pages.category.create');
     }
     
     /**
-     * store
+     * Menyimpan kategori baru ke database.
      *
-     * @param  mixed $request
-     * @return void
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
-    $request->validate([
-        'image' => 'required|image|mimes:jpeg,jpg,png|max:2000',
-        'name'  => 'required|unique:categories' 
-    ]); 
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,jpg,png|max:2000',
+            'name'  => 'required|unique:categories' 
+        ]); 
 
-    //upload image
-    $image = $request->file('image');
-    $image->storeAs('categories', $image->hashName(), 'public');
+        // Upload gambar
+        $image = $request->file('image');
+        $image->storeAs('categories', $image->hashName(), 'public');
 
-    //save to DB
-    $category = Category::create([
-        'image'  => $image->hashName(),
-        'name'   => $request->name,
-        'slug'   => Str::slug($request->name, '-')
-    ]);
+        // Simpan ke DB
+        $category = Category::create([
+            'image'  => $image->hashName(),
+            'name'   => $request->name,
+            'slug'   => Str::slug($request->name, '-')
+        ]);
 
-    if($category){
-            //redirect dengan pesan sukses
-            return redirect()->route('pages.category.index')->with(['success' => 'Data Berhasil Disimpan!']);
+        if($category){
+            // Menggunakan nama route dari proyek kita
+            return redirect()->route('category.index')->with(['success' => 'Data Berhasil Disimpan!']);
         }else{
-            //redirect dengan pesan error
-            return redirect()->route('pages.category.index')->with(['error' => 'Data Gagal Disimpan!']);
+            return redirect()->route('category.index')->with(['error' => 'Data Gagal Disimpan!']);
         }
     }
     
     /**
-     * edit
+     * Menampilkan form untuk mengedit kategori.
      *
-     * @param  mixed $request
-     * @param  mixed $category
-     * @return void
+     * @param  \App\Models\Category  $category
+     * @return \Illuminate\View\View
      */
     public function edit(Category $category)
     {
+        // Menggunakan path view dari proyek kita
         return view('pages.category.edit', compact('category'));
     }
     
     /**
-     * update
+     * Memperbarui data kategori di database.
      *
-     * @param  mixed $request
-     * @param  mixed $category
-     * @return void
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Category  $category
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, Category $category)
     {
@@ -91,63 +93,57 @@ class CategoryController extends Controller
             'name'  => 'required|unique:categories,name,'.$category->id 
         ]); 
 
-        //check jika image kosong
-        if($request->file('image') == '') {
-            
-            //update data tanpa image
-            $category = Category::findOrFail($category->id);
-            $category->update([
-                'name'   => $request->name,
-                'slug'   => Str::slug($request->name, '-')
-            ]);
+        // Siapkan data untuk diupdate
+        $updateData = [
+            'name' => $request->name,
+            'slug' => Str::slug($request->name, '-'),
+        ];
 
-        } else {
+        // Cek jika ada file gambar baru yang di-upload
+        if ($request->hasFile('image')) {
+            $request->validate(['image' => 'image|mimes:jpeg,jpg,png|max:2000']);
 
-            //hapus image lama
-            Storage::disk('public')->delete('categories/'.basename($category->image));
+            // **FIX**: Hapus gambar lama dengan cara yang aman
+            $oldImage = $category->getRawOriginal('image');
+            if ($oldImage && Storage::disk('public')->exists('categories/' . $oldImage)) {
+                Storage::disk('public')->delete('categories/' . $oldImage);
+            }
 
-            //upload image baru
+            // Upload gambar baru
             $image = $request->file('image');
-            $image->storeAs('categories', $image->hashName(), 'public');
+            $imageName = $image->hashName();
+            $image->storeAs('categories', $imageName, 'public');
 
-            //update dengan image baru
-            $category = Category::findOrFail($category->id);
-            $category->update([
-                'image'  => $image->hashName(),
-                'name'   => $request->name,
-                'slug'   => Str::slug($request->name, '-')
-            ]);
+            $updateData['image'] = $imageName;
         }
 
-        if($category){
-            //redirect dengan pesan sukses
-            return redirect()->route('pages.category.index')->with(['success' => 'Data Berhasil Diupdate!']);
-        }else{
-            //redirect dengan pesan error
-            return redirect()->route('pages.category.index')->with(['error' => 'Data Gagal Diupdate!']);
+        if ($category->update($updateData)) {
+            // Menggunakan nama route dari proyek kita
+            return redirect()->route('category.index')->with(['success' => 'Data Berhasil Diupdate!']);
+        } else {
+            return redirect()->route('category.index')->with(['error' => 'Data Gagal Diupdate!']);
         }
     }
     
     /**
-     * destroy
+     * Menghapus kategori dari database.
      *
-     * @param  mixed $id
-     * @return void
+     * @param  \App\Models\Category  $category
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($id)
+    public function destroy(Category $category)
     {
-        $category = Category::findOrFail($id);
-        Storage::disk('public')->delete('categories/'.basename($category->image));
-        $category->delete();
+        // **FIX**: Ambil nama file asli sebelum dihapus
+        $imageNameToDelete = $category->getRawOriginal('image');
 
-        if($category){
-            return response()->json([
-                'status' => 'success'
-            ]);
-        }else{
-            return response()->json([
-                'status' => 'error'
-            ]);
+        if ($category->delete()) {
+            // Hapus file gambar HANYA JIKA record database berhasil dihapus
+            if ($imageNameToDelete && Storage::disk('public')->exists('categories/' . $imageNameToDelete)) {
+                Storage::disk('public')->delete('categories/' . $imageNameToDelete);
+            }
+            return response()->json(['status' => 'success']);
         }
+
+        return response()->json(['status' => 'error']);
     }
 }
