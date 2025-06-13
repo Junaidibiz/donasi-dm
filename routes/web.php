@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DonaturController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DonationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TrixUploadController;
 
@@ -31,7 +32,11 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     // Route untuk Donatur 
     Route::get('/donatur', [DonaturController::class, 'index'])->name('donatur.index');
 
-    // Route untuk menangani upload gambar Trix <-- TAMBAHKAN BLOK INI
+    // Routes untuk Laporan Donasi <-- TAMBAHKAN BLOK INI
+    Route::get('/donation', [DonationController::class, 'index'])->name('donation.index');
+    Route::get('/donation/filter', [DonationController::class, 'filter'])->name('donation.filter');
+
+    // Route untuk menangani upload gambar Trix 
     Route::post('/trix-upload', [TrixUploadController::class, 'store'])->name('trix.upload');
     Route::post('/trix-remove', [TrixUploadController::class, 'remove'])->name('trix.remove');
     
