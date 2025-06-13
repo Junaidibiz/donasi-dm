@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CampaignController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,13 +18,13 @@ Route::redirect('/', 'login');
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     
     // Route untuk Dashboard
-    // URL: /dashboard -> Nama: dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Route Resource untuk Category
-    // URL: /category, /category/create, dll.
-    // Nama: category.index, category.create, dll.
     Route::resource('category', CategoryController::class);
+    
+    // Route Resource untuk Campaign
+    Route::resource('campaign', CampaignController::class);
     
     // Fallback jika route tidak ditemukan
     Route::fallback(function() {
