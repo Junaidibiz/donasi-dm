@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SliderController;
 use App\Http\Controllers\DonaturController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\CategoryController;
@@ -35,6 +36,15 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     // Routes untuk Laporan Donasi <-- TAMBAHKAN BLOK INI
     Route::get('/donation', [DonationController::class, 'index'])->name('donation.index');
     Route::get('/donation/filter', [DonationController::class, 'filter'])->name('donation.filter');
+
+    // --- Route untuk Slider ---
+    // Karena kita hanya butuh beberapa method, kita gunakan ->only()
+    Route::resource('/slider', SliderController::class)->only([
+        'index',    // GET /slider
+        'create',   // GET /slider/create
+        'store',    // POST /slider
+        'destroy'   // DELETE /slider/{slider}
+    ]);
 
     // Route untuk menangani upload gambar Trix 
     Route::post('/trix-upload', [TrixUploadController::class, 'store'])->name('trix.upload');
