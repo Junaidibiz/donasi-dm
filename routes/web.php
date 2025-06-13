@@ -1,9 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DonaturController;
 use App\Http\Controllers\CampaignController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TrixUploadController;
 
 /*
@@ -26,6 +27,9 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     
     // Route Resource untuk Campaign
     Route::resource('campaign', CampaignController::class);
+
+    // Route untuk Donatur 
+    Route::get('/donatur', [DonaturController::class, 'index'])->name('donatur.index');
 
     // Route untuk menangani upload gambar Trix <-- TAMBAHKAN BLOK INI
     Route::post('/trix-upload', [TrixUploadController::class, 'store'])->name('trix.upload');
