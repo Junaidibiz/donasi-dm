@@ -14,7 +14,7 @@ class TrixUploadController extends Controller
     {
         // Validasi bahwa file ada dan merupakan gambar
         $request->validate([
-            'attachment' => 'required|image',
+            'attachment' => 'required|image|max:2048',
         ]);
 
         // Simpan file ke storage publik

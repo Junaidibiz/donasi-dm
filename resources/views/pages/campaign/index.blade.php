@@ -29,7 +29,7 @@
             <div class="overflow-x-auto">
                 <table class="table-auto w-full dark:text-gray-300">
                     {{-- Table header --}}
-                    <thead class="text-xs font-semibold uppercase text-gray-600 dark:text-gray-500 bg-gray-700/40 dark:bg-gray-700/50">
+                    <thead class="text-xs font-semibold uppercase text-gray-600 dark:text-gray-500 bg-damu-700/40 dark:bg-gray-700/50">
                         <tr>
                             <th class="py-4 px-4 whitespace-nowrap"><div class="font-semibold text-left">JUDUL CAMPAIGN</div></th>
                             <th class="py-4 px-1 whitespace-nowrap"><div class="font-semibold text-left">KATEGORI</div></th>
@@ -42,7 +42,7 @@
                     <tbody class="text-sm divide-y divide-gray-200 dark:divide-gray-700/60">
                         @forelse ($campaigns as $campaign)
                             <tr>
-                                <td class="p-2 whitespace-nowrap"><div class="font-medium text-gray-800 dark:text-gray-100">{{ $campaign->title }}</div></td>
+                                <td class="p-2 px-5 whitespace-nowrap"><div class="font-medium text-gray-800 dark:text-gray-100">{{ $campaign->title }}</div></td>
                                 <td class="p-2 whitespace-nowrap"><div class="font-medium text-gray-800 dark:text-gray-100">{{ $campaign->category->name }}</div></td>
                                 <td class="p-2 whitespace-nowrap"><div class="font-medium text-gray-800 dark:text-gray-100">{{ moneyFormat($campaign->target_donation) }}</div></td>
                                 <td class="p-2 whitespace-nowrap"><div class="font-medium text-gray-800 dark:text-gray-100">{{ \Carbon\Carbon::parse($campaign->max_date)->format('d F Y') }}</div></td>

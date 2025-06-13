@@ -32,7 +32,7 @@
         <div class="bg-white dark:bg-gray-800 shadow-lg rounded-xl border border-gray-200 dark:border-gray-700/60 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="table-auto w-full dark:text-gray-300">
-                    <thead class="text-xs font-semibold uppercase text-gray-600 dark:text-gray-500 bg-gray-700/40 dark:bg-gray-700/50">
+                    <thead class="text-xs font-semibold uppercase text-gray-600 dark:text-gray-500 bg-damu-700/40 dark:bg-gray-700/50">
                         <tr>
                             <th class="py-4 px-2 whitespace-nowrap"><div class="font-semibold text-center">GAMBAR</div></th>
                             <th class="py-4 px-1 whitespace-nowrap"><div class="font-semibold text-left">NAMA KATEGORI</div></th>
