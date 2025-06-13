@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CampaignController;
+use App\Http\Controllers\TrixUploadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +26,10 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     
     // Route Resource untuk Campaign
     Route::resource('campaign', CampaignController::class);
+
+    // Route untuk menangani upload gambar Trix <-- TAMBAHKAN BLOK INI
+    Route::post('/trix-upload', [TrixUploadController::class, 'store'])->name('trix.upload');
+    Route::post('/trix-remove', [TrixUploadController::class, 'remove'])->name('trix.remove');
     
     // Fallback jika route tidak ditemukan
     Route::fallback(function() {

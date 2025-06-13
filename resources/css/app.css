@@ -1,3 +1,4 @@
+@import "trix/dist/trix.css";
 @import "tailwindcss";
 @import "./additional-styles/flatpickr.css";
 @import "./additional-styles/utility-patterns.css" layer(components);
@@ -147,3 +148,109 @@
         border-color: var(--color-gray-200, currentColor);
     }
 }
+
+/* === STYLING FINAL & LENGKAP UNTUK TRIX EDITOR === */
+
+/* Container utama editor */
+trix-editor {
+    display: block;
+    width: 100%;
+    min-height: 150px;
+    padding: theme("padding.2") theme("padding.3");
+    border-width: 1px;
+    border-color: theme("colors.gray.200");
+    border-radius: theme("borderRadius.lg");
+    box-shadow: theme("boxShadow.xs");
+    background-color: theme("colors.white");
+    font-size: theme("fontSize.sm");
+    color: theme("colors.gray.800");
+    line-height: theme("lineHeight.5");
+}
+
+/* Style untuk mode gelap pada container utama */
+.dark trix-editor {
+    border-color: theme("colors.gray.700 / 0.6");
+    background-color: theme("colors.gray.800");
+    color: theme("colors.gray.100");
+}
+
+/* Hover dan Focus state */
+trix-editor:hover {
+    border-color: theme("colors.gray.300");
+}
+.dark trix-editor:hover {
+    border-color: theme("colors.gray.600");
+}
+trix-editor:focus {
+    border-color: theme("colors.gray.300");
+    outline: none;
+}
+.dark trix-editor:focus {
+    border-color: theme("colors.gray.600");
+}
+
+/* Toolbar */
+trix-toolbar .trix-button-group {
+    border-color: theme("colors.gray.200");
+    background-color: theme(
+        "colors.gray.50"
+    ); /* Latar belakang toolbar terang */
+}
+.dark trix-toolbar .trix-button-group {
+    border-color: theme("colors.gray.700 / 0.6");
+    background-color: theme(
+        "colors.gray.800"
+    ); /* Latar belakang toolbar gelap */
+}
+
+/* Tombol-tombol di Toolbar */
+trix-toolbar .trix-button {
+    background-color: transparent; /* Buat transparan agar mengikuti background group */
+}
+.dark trix-toolbar .trix-button {
+    background-color: transparent;
+}
+
+trix-toolbar .trix-button:not(:first-child) {
+    border-left: 1px solid theme("colors.gray.200");
+}
+.dark trix-toolbar .trix-button:not(:first-child) {
+    border-left-color: theme("colors.gray.700 / 0.6");
+}
+
+/* Warna ikon di mode gelap */
+.dark trix-toolbar .trix-button .trix-icon {
+    filter: invert(100%);
+}
+
+/* Tombol yang sedang aktif */
+trix-toolbar .trix-button.trix-active {
+    background-color: theme("colors.gray.200");
+}
+.dark trix-toolbar .trix-button.trix-active {
+    background-color: theme("colors.damu.500");
+    filter: invert(0%);
+}
+
+/* Dialog/pop-up Trix */
+trix-dialog {
+    background-color: theme("colors.white");
+    border-color: theme("colors.gray.300");
+}
+.dark trix-dialog {
+    background-color: theme("colors.gray.800");
+    border-color: theme("colors.gray.700");
+    color: theme("colors.gray.100");
+}
+trix-dialog input[type="url"],
+trix-dialog input[type="text"] {
+    border-color: theme("colors.gray.200");
+}
+.dark trix-dialog input[type="url"],
+.dark trix-dialog input[type="text"] {
+    background-color: theme("colors.gray.900");
+    border-color: theme("colors.gray.700");
+    color: theme("colors.gray.100");
+}
+
+/* === AKHIR STYLING FINAL UNTUK TRIX EDITOR === */

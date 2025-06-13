@@ -1,32 +1,34 @@
-@import 'flatpickr/dist/flatpickr.min.css';
+@import "flatpickr/dist/flatpickr.min.css";
 
 /* Customise flatpickr */
 * {
     --calendarPadding: 24px;
     --daySize: 36px;
-    --daysWidth: calc(var(--daySize)*7);
+    --daysWidth: calc(var(--daySize) * 7);
 }
 
 @keyframes fpFadeInDown {
-  from {
-    opacity: 0;
-    transform: translate3d(0, -8px, 0);
-  }
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
+    from {
+        opacity: 0;
+        transform: translate3d(0, -8px, 0);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
 }
 
 .flatpickr-calendar {
     border: inherit;
     @apply bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700/60 left-1/2;
-    margin-left: calc(calc(var(--daysWidth) + calc(var(--calendarPadding)*2))*0.5*-1);
+    margin-left: calc(
+        calc(var(--daysWidth) + calc(var(--calendarPadding) * 2)) * 0.5 * -1
+    );
     padding: var(--calendarPadding);
-    width: calc(var(--daysWidth) + calc(var(--calendarPadding)*2));
+    width: calc(var(--daysWidth) + calc(var(--calendarPadding) * 2));
 }
 
-@media (width >= theme(--breakpoint-lg)) {
+@media (width >= theme(--breakpoint-md)) {
     .flatpickr-calendar {
         @apply left-0 right-auto;
         margin-left: 0;
@@ -84,8 +86,8 @@
     @apply bg-transparent;
 }
 
-.flatpickr-day, 
-.flatpickr-day.prevMonthDay, 
+.flatpickr-day,
+.flatpickr-day.prevMonthDay,
 .flatpickr-day.nextMonthDay,
 .flatpickr-day.selected.startRange,
 .flatpickr-day.startRange.startRange,
@@ -113,6 +115,8 @@
     margin: 0;
 }
 
+/* DI BAWAH INI ADALAH PERUBAHANNYA */
+
 .flatpickr-day.selected,
 .flatpickr-day.startRange,
 .flatpickr-day.endRange,
@@ -131,7 +135,8 @@
 .flatpickr-day.selected.nextMonthDay,
 .flatpickr-day.startRange.nextMonthDay,
 .flatpickr-day.endRange.nextMonthDay {
-    @apply bg-violet-600 text-violet-50;
+    /* Mengganti bg-violet-600 menjadi bg-damu-500 dan text menjadi putih */
+    @apply bg-damu-500 text-white;
 }
 
 .flatpickr-day.inRange,
@@ -148,13 +153,14 @@
 .flatpickr-day.nextMonthDay:focus,
 .flatpickr-day.today:hover,
 .flatpickr-day.today:focus {
-    @apply bg-violet-500 text-violet-50;
+    /* Mengganti bg-violet-500 menjadi bg-damu-400 dan text menjadi putih */
+    @apply bg-damu-400 text-white;
 }
 
 .flatpickr-day.inRange,
-.flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n+1)),
-.flatpickr-day.startRange.startRange + .endRange:not(:nth-child(7n+1)),
-.flatpickr-day.endRange.startRange + .endRange:not(:nth-child(7n+1)) {
+.flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n + 1)),
+.flatpickr-day.startRange.startRange + .endRange:not(:nth-child(7n + 1)),
+.flatpickr-day.endRange.startRange + .endRange:not(:nth-child(7n + 1)) {
     box-shadow: none;
 }
 
@@ -168,7 +174,7 @@
 .flatpickr-months .flatpickr-next-month {
     position: static;
     height: auto;
-    @apply text-gray-400 hover:text-gray-900 dark:text-gray-500 dark:hover:text-gray-300;    
+    @apply text-gray-400 hover:text-gray-900 dark:text-gray-500 dark:hover:text-gray-300;
 }
 
 .flatpickr-months .flatpickr-prev-month svg,
