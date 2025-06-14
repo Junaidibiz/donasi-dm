@@ -18,14 +18,16 @@
                     <div>
                         <x-label for="image">GAMBAR <span class="text-red-500">*</span></x-label>
                         <x-input type="file" name="image" id="image" class="w-full" required />
+                        <div class="text-xs text-gray-500 mt-1">Disarankan gambar dengan rasio 16:9 atau landscape.
+                        </div>
                         @error('image')
                             <div class="text-xs mt-1 text-red-500">{{ $message }}</div>
                         @enderror
                     </div>
                     <div>
-                        <x-label for="link">LINK SLIDER <span class="text-red-500">*</span></x-label>
+                        <x-label for="link">LINK SLIDER (Opsional)</x-label>
                         <x-input type="text" name="link" id="link" class="w-full" value="{{ old('link') }}"
-                            required placeholder="Contoh: https://www.google.com" />
+                            placeholder="Contoh: https://www.google.com" />
                         @error('link')
                             <div class="text-xs mt-1 text-red-500">{{ $message }}</div>
                         @enderror

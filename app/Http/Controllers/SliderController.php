@@ -30,19 +30,26 @@ class SliderController extends Controller
      */
     public function store(Request $request)
     {
+        // PERUBAHAN 1: Validasi link diubah menjadi 'nullable' dan 'url'
         $request->validate([
             'image' => 'required|image|mimes:jpeg,jpg,png|max:2000',
-            'link'  => 'required|url'
+            'link'  => 'nullable|url' 
         ]);
 
         // Upload gambar
         $image = $request->file('image');
         $image->storeAs('public/sliders', $image->hashName());
 
+        // PERUBAHAN 2: Jika link kosong, beri nilai default '#'
+        $link = $request->link ?? '#';
+        if (empty(trim($link))) {
+            $link = '#';
+        }
+
         // Simpan ke DB
         Slider::create([
             'image'  => $image->hashName(),
-            'link'   => $request->link
+            'link'   => $link
         ]);
 
         return redirect()->route('slider.index')->with(['success' => 'Data Slider Berhasil Disimpan!']);
