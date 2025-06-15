@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\SliderController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\CampaignController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\DonationController;
 use App\Http\Controllers\Api\RegisterController;
 
 /*
@@ -33,6 +34,9 @@ Route::get('/campaign/{slug}', [CampaignController::class, 'show']);
 // Route untuk Slider
 Route::get('/slider', [SliderController::class, 'index']);
 
+// Route untuk notifikasi Midtrans
+Route::post('/donation/notification', [DonationController::class, 'notificationHandler']);
+
 
 // --- API TERPROTEKSI (Perlu login) ---
 Route::middleware('auth:sanctum')->group(function () {
@@ -47,5 +51,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [ProfileController::class, 'index']);
     Route::post('/profile', [ProfileController::class, 'update']);
     Route::post('/profile/password', [ProfileController::class, 'updatePassword']);
+
+    // Route untuk Donasi (membuat & melihat riwayat)
+    Route::post('/donation', [DonationController::class, 'store']);
+    Route::get('/donation', [DonationController::class, 'index']);
 
 });
