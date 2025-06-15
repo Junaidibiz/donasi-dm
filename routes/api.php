@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\SliderController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\CampaignController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\RegisterController;
@@ -41,5 +42,10 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::post('/logout', [LoginController::class, 'logout']);
+
+    // Route untuk Profile
+    Route::get('/profile', [ProfileController::class, 'index']);
+    Route::post('/profile', [ProfileController::class, 'update']);
+    Route::post('/profile/password', [ProfileController::class, 'updatePassword']);
 
 });
