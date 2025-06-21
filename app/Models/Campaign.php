@@ -3,55 +3,74 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class Campaign extends Model
 {
     /**
-     * fillable
+     * Atribut yang dapat diisi secara massal.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $fillable = [
         'title', 'slug', 'category_id', 'target_donation', 'max_date', 'description', 'image', 'user_id',
     ];
 
     /**
-     * category
+     * The attributes that should be cast.
      *
-     * @return void
+     * @var array<string, string>
      */
-    public function category()
+    protected $casts = [
+        'max_date' => 'date',
+    ];
+
+    /**
+     * Mendefinisikan relasi ke model Category.
+     */
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
     /**
-     * user
-     *
-     * @return void
+     * Mendefinisikan relasi ke model User.
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
     /**
-     * donations
-     *
-     * @return void
+     * Mendefinisikan relasi ke model Donation.
      */
-    public function donations()
+    public function donations(): HasMany
     {
         return $this->hasMany(Donation::class);
     }
 
     /**
-     * sumDonation
-     *
-     * @return void
+     * Relasi untuk menjumlahkan donasi yang sukses.
      */
-    public function sumDonation() 
+    public function sumDonation(): HasMany
     {
-        return $this->hasMany(Donation::class)->selectRaw('donations.campaign_id,SUM(donations.amount) as total')->where('donations.status', 'success')->groupBy('donations.campaign_id');
+        return $this->hasMany(Donation::class)
+            ->selectRaw('donations.campaign_id, SUM(donations.amount) as total')
+            ->where('donations.status', 'success')
+            ->groupBy('donations.campaign_id');
+    }
+
+    /**
+     * Accessor untuk mendapatkan URL gambar yang valid.
+     */
+    public function getImageAttribute(): string
+    {
+        if ($this->attributes['image'] && Storage::disk('public')->exists('campaigns/' . $this->attributes['image'])) {
+            return Storage::url('campaigns/' . $this->attributes['image']);
+        }
+        
+        return 'https://via.placeholder.com/800x400';
     }
 }
