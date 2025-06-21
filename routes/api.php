@@ -51,6 +51,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [ProfileController::class, 'index']);
     Route::post('/profile', [ProfileController::class, 'update']);
     Route::post('/profile/password', [ProfileController::class, 'updatePassword']);
+    // --- TAMBAHKAN ROUTE BARU INI ---
+    Route::post('/profile/remove-avatar', [ProfileController::class, 'removeAvatar']); // <-- ROUTE BARU
+    // ---------------------------------
 
     // Route untuk Donasi (membuat & melihat riwayat)
     Route::post('/donation', [DonationController::class, 'store']);

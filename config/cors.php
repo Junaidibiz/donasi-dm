@@ -19,16 +19,20 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => [
+        'http://localhost:5173', // <-- PASTIKAN BARIS INI ADA DAN TIDAK ADA TYPO
+        // Jika Anda juga mengakses backend via donasi-dm.test dari browser, Anda bisa tambahkan juga:
+        // 'http://donasi-dm.test',
+        // Untuk debugging cepat, Anda bisa pakai '*' TAPI JANGAN UNTUK PRODUCTION:
+        // '*',
+    ],
+
+    'allowed_methods' => ['*'], // Izinkan semua metode (GET, POST, PUT, DELETE, OPTIONS)
+    'allowed_headers' => ['*'], // Izinkan semua header
+    'exposed_headers' => [],
+    'max_age' => 0,
+    'supports_credentials' => true, // Penting untuk Sanctum/Passport dan Cookies/Auth Headers
 
     'allowed_origins_patterns' => [],
-
-    'allowed_headers' => ['*'],
-
-    'exposed_headers' => [],
-
-    'max_age' => 0,
-
-    'supports_credentials' => false,
 
 ];
