@@ -52,7 +52,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile', [ProfileController::class, 'update']);
     Route::post('/profile/password', [ProfileController::class, 'updatePassword']);
     // --- TAMBAHKAN ROUTE BARU INI ---
-    Route::post('/profile/remove-avatar', [ProfileController::class, 'removeAvatar']); // <-- ROUTE BARU
+    Route::delete('/profile/avatar', [App\Http\Controllers\Api\ProfileController::class, 'removeAvatar']);
     // ---------------------------------
 
     // Route untuk Donasi (membuat & melihat riwayat)

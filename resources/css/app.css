@@ -253,4 +253,9 @@ trix-dialog input[type="text"] {
     color: theme("colors.gray.100");
 }
 
+/* Menghilangkan caption (nama file) pada gambar di Trix Editor */
+.trix-content figcaption {
+    display: none;
+}
+
 /* === AKHIR STYLING FINAL UNTUK TRIX EDITOR === */
