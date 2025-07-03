@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Campaign;
 use App\Models\Donation;
+// TAMBAHKAN USE STATEMENT DI BAWAH INI
+use App\Http\Resources\CampaignResource;
+use App\Http\Resources\DonationResource;
 
 class CampaignController extends Controller
 {
@@ -15,7 +18,7 @@ class CampaignController extends Controller
      */
     public function index()
     {
-        // Ambil data campaign dengan relasi user dan total donasi
+        // Method ini tidak perlu diubah
         $campaigns = Campaign::with('user', 'sumDonation')
             ->when(request()->q, function ($query) {
                 $query->where('title', 'like', '%' . request()->q . '%');
@@ -36,23 +39,25 @@ class CampaignController extends Controller
      * @param  string  $slug
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show($slug)
+    public function show($slug) // GANTI SELURUH METHOD INI
     {
-        // Ambil detail campaign
+        // Ambil detail campaign dengan relasi yang dibutuhkan
         $campaign = Campaign::with('user', 'sumDonation')->where('slug', $slug)->first();
 
         if ($campaign) {
-            // Ambil donasi untuk campaign ini
-            $donations = Donation::with('donatur')->where('campaign_id', $campaign->id)
+            // Ambil donasi untuk campaign ini dengan relasinya
+            $donations = Donation::with('donatur')
+                ->where('campaign_id', $campaign->id)
                 ->where('status', 'success')
                 ->latest()
                 ->get();
 
+            // Kembalikan response menggunakan API Resources
             return response()->json([
                 'success'   => true,
                 'message'   => 'Detail Data Campaign: ' . $campaign->title,
-                'data'      => $campaign,
-                'donations' => $donations
+                'data'      => new CampaignResource($campaign), // Gunakan CampaignResource
+                'donations' => DonationResource::collection($donations) // Gunakan DonationResource untuk koleksi
             ], 200);
         }
 

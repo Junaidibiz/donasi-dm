@@ -1,14 +1,14 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\LoginController;
-use App\Http\Controllers\Api\SliderController;
-use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\CampaignController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\DonationController;
+use App\Http\Controllers\Api\LoginController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RegisterController;
+use App\Http\Controllers\Api\SliderController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,8 +51,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [ProfileController::class, 'index']);
     Route::post('/profile', [ProfileController::class, 'update']);
     Route::post('/profile/password', [ProfileController::class, 'updatePassword']);
+    
     // --- TAMBAHKAN ROUTE BARU INI ---
-    Route::delete('/profile/avatar', [App\Http\Controllers\Api\ProfileController::class, 'removeAvatar']);
+    Route::delete('/profile/avatar', [ProfileController::class, 'removeAvatar']);
     // ---------------------------------
 
     // Route untuk Donasi (membuat & melihat riwayat)
