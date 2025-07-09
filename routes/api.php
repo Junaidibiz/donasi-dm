@@ -27,6 +27,9 @@ Route::get('/category', [CategoryController::class, 'index']);
 Route::get('/category/{slug}', [CategoryController::class, 'show']);
 Route::get('/categoryHome', [CategoryController::class, 'categoryHome']);
 
+// --- TAMBAHKAN ROUTE PENCARIAN INI ---
+Route::get('/campaign/search', [CampaignController::class, 'search']); // <--- BARIS PENTING YANG DITAMBAHKAN
+// -------------------------------------
 // Route untuk Campaign
 Route::get('/campaign', [CampaignController::class, 'index']);
 Route::get('/campaign/{slug}', [CampaignController::class, 'show']);

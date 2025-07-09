@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Campaign;
 use App\Models\Donation;
-// TAMBAHKAN USE STATEMENT DI BAWAH INI
+use Illuminate\Http\Request; // Import Request
 use App\Http\Resources\CampaignResource;
 use App\Http\Resources\DonationResource;
 
@@ -16,12 +16,11 @@ class CampaignController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request) // Tambahkan Request $request
     {
-        // Method ini tidak perlu diubah
         $campaigns = Campaign::with('user', 'sumDonation')
-            ->when(request()->q, function ($query) {
-                $query->where('title', 'like', '%' . request()->q . '%');
+            ->when($request->q, function ($query) use ($request) { // Gunakan $request->q
+                $query->where('title', 'like', '%' . $request->q . '%');
             })
             ->latest()
             ->paginate(5);
@@ -39,7 +38,7 @@ class CampaignController extends Controller
      * @param  string  $slug
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show($slug) // GANTI SELURUH METHOD INI
+    public function show($slug)
     {
         // Ambil detail campaign dengan relasi yang dibutuhkan
         $campaign = Campaign::with('user', 'sumDonation')->where('slug', $slug)->first();
@@ -65,5 +64,29 @@ class CampaignController extends Controller
             'success' => false,
             'message' => 'Data Campaign Tidak Ditemukan!',
         ], 404);
+    }
+
+    /**
+     * API untuk mencari campaign berdasarkan kata kunci.
+     * Mengembalikan data dalam format JSON.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function search(Request $request)
+    {
+        $keyword = $request->keyword; // Mengambil kata kunci dari parameter 'keyword'
+
+        // Lakukan pencarian campaign berdasarkan judul
+        $campaigns = Campaign::with('user', 'sumDonation')
+                        ->where('title', 'like', '%' . $keyword . '%')
+                        ->latest()
+                        ->paginate(10); // Atau paginate(5) jika ingin konsisten dengan index()
+
+        return response()->json([
+            'success' => true,
+            'message' => 'List Data Campaign : ' . $keyword,
+            'data'    => $campaigns // Laravel's paginate secara otomatis menyertakan data dalam kunci 'data'
+        ]);
     }
 }
