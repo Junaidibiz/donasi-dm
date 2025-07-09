@@ -2,46 +2,79 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Campaign;
+use App\Models\Category;
 use App\Models\Donation;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+use App\Exports\DonationsExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class DonationController extends Controller
 {
     /**
      * Menampilkan halaman utama laporan donasi.
-     *
-     * @return \Illuminate\View\View
+     * Jika ada request filter, akan menampilkan juga hasilnya.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Mengarahkan ke view yang akan kita buat nanti
-        return view('pages.donation.index');
+        $campaigns = Campaign::latest()->get();
+        $categories = Category::latest()->get();
+
+        $donations = null;
+        $total = 0;
+
+        // Cek jika ada request filter yang dikirim
+        if ($request->has('date_from') || $request->has('campaign_id') || $request->has('category_id')) {
+            $donations = $this->getFilteredDonations($request);
+            $total = $donations->sum('amount');
+        }
+
+        return view('pages.donation.index', compact('donations', 'total', 'campaigns', 'categories'));
     }
-    
-    /**
-     * Menyaring data donasi berdasarkan rentang tanggal.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\View\View
-     */
-    public function filter(Request $request)
+
+    public function exportExcel(Request $request)
     {
-        $request->validate([
-            'date_from'  => 'required|date',
-            'date_to'    => 'required|date|after_or_equal:date_from',
-        ]);
+        return Excel::download(new DonationsExport($request->all()), 'laporan_donasi.xlsx');
+    }
 
-        $date_from  = $request->date_from;
-        $date_to    = $request->date_to;
-
-        // Get data donasi berdasarkan rentang tanggal
-        $donations = Donation::with('campaign', 'donatur')->where('status', 'success')->whereDate('created_at', '>=', $date_from)->whereDate('created_at', '<=', $date_to)->get();
-
-        // Get total donasi berdasarkan rentang tanggal     
-        $total = Donation::where('status', 'success')->whereDate('created_at', '>=', $date_from)->whereDate('created_at', '<=', $date_to)->sum('amount');
+    public function exportPdf(Request $request)
+    {
+        $donations = $this->getFilteredDonations($request);
+        $total = $donations->sum('amount');
         
-        // Kembali ke view yang sama dengan membawa data hasil filter
-        return view('pages.donation.index', compact('donations', 'total', 'date_from', 'date_to'));
+        // Ambil tanggal dari request untuk dikirim ke view
+        $date_from = $request->input('date_from');
+        $date_to = $request->input('date_to');
+
+        // Muat view dengan semua data yang diperlukan
+        $pdf = Pdf::loadView('pages.donation.pdf', compact('donations', 'total', 'date_from', 'date_to'));
+        
+        return $pdf->download('laporan_donasi.pdf');
+    }
+
+
+    private function getFilteredDonations(Request $request)
+    {
+        // Validasi input
+        $request->validate([
+            'date_from'  => 'nullable|date',
+            'date_to'    => 'nullable|date|after_or_equal:date_from',
+        ]);
+        
+        $query = Donation::with('campaign.category', 'donatur')->where('status', 'success');
+
+        if ($request->filled('date_from') && $request->filled('date_to')) {
+            $query->whereDate('created_at', '>=', $request->date_from)->whereDate('created_at', '<=', $request->date_to);
+        }
+        if ($request->filled('campaign_id')) {
+            $query->where('campaign_id', $request->campaign_id);
+        }
+        if ($request->filled('category_id')) {
+            $query->whereHas('campaign', function ($q) use ($request) {
+                $q->where('category_id', $request->category_id);
+            });
+        }
+        return $query->get();
     }
 }
