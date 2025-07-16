@@ -51,13 +51,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Flatpickr
     flatpickr(".datepicker", {
-        mode: "single", // <-- Diubah menjadi 'single'
+        mode: "single",
         static: true,
         monthSelectorType: "static",
-        dateFormat: "Y-m-d", // Format standar untuk database
+        dateFormat: "Y-m-d",
         prevArrow:
             '<svg class="fill-current" width="7" height="11" viewBox="0 0 7 11"><path d="M5.4 10.8l1.4-1.4-4-4 4-4L5.4 0 0 5.4z" /></svg>',
         nextArrow:
             '<svg class="fill-current" width="7" height="11" viewBox="0 0 7 11"><path d="M1.4 10.8L0 9.4l4-4-4-4L1.4 0l5.4 5.4z" /></svg>',
+
+        // --- TAMBAHKAN LOGIKA DI BAWAH INI ---
+        onReady: (selectedDates, dateStr, instance) => {
+            // Buat tombol "Hari ini"
+            const todayBtn = document.createElement("button");
+            todayBtn.textContent = "Hari ini";
+            // Gunakan kelas dari template agar tampilan konsisten
+            todayBtn.className =
+                "flatpickr-button btn bg-damu-500 hover:bg-damu-600 text-white btn-sm";
+
+            // Tambahkan aksi saat tombol diklik
+            todayBtn.addEventListener("click", (e) => {
+                e.preventDefault();
+                instance.setDate(new Date(), true); // Set tanggal ke hari ini dan picu event change
+                instance.close();
+            });
+
+            // Tambahkan tombol ke dalam kalender
+            instance.calendarContainer.appendChild(todayBtn);
+        },
     });
 });
