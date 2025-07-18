@@ -115,8 +115,6 @@
     margin: 0;
 }
 
-/* DI BAWAH INI ADALAH PERUBAHANNYA */
-
 .flatpickr-day.selected,
 .flatpickr-day.startRange,
 .flatpickr-day.endRange,
@@ -135,7 +133,6 @@
 .flatpickr-day.selected.nextMonthDay,
 .flatpickr-day.startRange.nextMonthDay,
 .flatpickr-day.endRange.nextMonthDay {
-    /* Mengganti bg-violet-600 menjadi bg-damu-500 dan text menjadi putih */
     @apply bg-damu-500 text-white;
 }
 
@@ -150,12 +147,23 @@
 .flatpickr-day.nextMonthDay:hover,
 .flatpickr-day:focus,
 .flatpickr-day.prevMonthDay:focus,
-.flatpickr-day.nextMonthDay:focus,
-.flatpickr-day.today:hover,
-.flatpickr-day.today:focus {
-    /* Mengganti bg-violet-500 menjadi bg-damu-400 dan text menjadi putih */
+.flatpickr-day.nextMonthDay:focus {
     @apply bg-damu-400 text-white;
 }
+
+/* === TAMBAHKAN BLOK BARU DI BAWAH INI === */
+
+/* Style khusus untuk tanggal hari ini */
+.flatpickr-day.today {
+    @apply border border-damu-500 text-damu-600;
+}
+
+.flatpickr-day.today:hover,
+.flatpickr-day.today:focus {
+    @apply bg-damu-100 text-damu-700;
+}
+
+/* === AKHIR BLOK BARU === */
 
 .flatpickr-day.inRange,
 .flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n + 1)),

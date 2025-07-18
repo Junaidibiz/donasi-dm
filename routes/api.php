@@ -1,14 +1,15 @@
 <?php
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\LoginController;
+use App\Http\Controllers\Api\SliderController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\CampaignController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\DonationController;
-use App\Http\Controllers\Api\LoginController;
-use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RegisterController;
-use App\Http\Controllers\Api\SliderController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\ForgotPasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +18,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 // --- API PUBLIK (Tidak perlu login) ---
+
+
+// --- TAMBAHKAN ROUTE LUPA PASSWORD DI SINI ---
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
+Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword']);
 
 // Route untuk Registrasi dan Login Donatur
 Route::post('/register', RegisterController::class);
