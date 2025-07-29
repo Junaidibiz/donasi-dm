@@ -20,6 +20,17 @@
                             <div class="text-xs mt-1 text-rose-500">{{ $message }}</div>
                         @enderror
                     </div>
+
+                    {{-- Menambahkan field title --}}
+                    <div>
+                        <x-label for="title">Judul Laporan <span class="text-rose-500">*</span></x-label>
+                        <x-input id="title" class="w-full" type="text" name="title" :value="old('title')"
+                            required />
+                        @error('title')
+                            <div class="text-xs mt-1 text-rose-500">{{ $message }}</div>
+                        @enderror
+                    </div>
+
                     <div>
                         <x-label for="description">Deskripsi <span class="text-rose-500">*</span></x-label>
                         <input id="description" type="hidden" name="description" value="{{ old('description') }}">
@@ -54,4 +65,53 @@
             </form>
         </div>
     </div>
+
+    {{-- ========================================================= --}}
+    {{--    SCRIPT UNTUK UPLOAD GAMBAR DARI TRIX EDITOR            --}}
+    {{-- ========================================================= --}}
+    @push('scripts')
+        <script>
+            document.addEventListener('trix-attachment-add', function(event) {
+                const data = new FormData();
+                data.append('file', event.attachment.file);
+
+                fetch('{{ route('expense-reports.upload') }}', {
+                        method: 'POST',
+                        body: data,
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        event.attachment.setAttributes({
+                            url: result.url,
+                            href: result.url
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Upload error:', error);
+                        alert('Gagal mengunggah gambar.');
+                    });
+            });
+
+            document.addEventListener('trix-attachment-remove', function(event) {
+                const url = event.attachment.attachment.attributes.values.url;
+
+                fetch('{{ route('expense-reports.removeUpload') }}', {
+                        method: 'DELETE',
+                        body: JSON.stringify({
+                            url: url
+                        }),
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Remove error:', error);
+                    });
+            });
+        </script>
+    @endpush
 </x-app-layout>

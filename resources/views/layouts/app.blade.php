@@ -32,6 +32,16 @@
             document.querySelector('html').style.colorScheme = 'dark';
         }
     </script>
+
+    {{-- ========================================================= --}}
+    {{--    TAMBAHKAN KODE CSS DI BAWAH INI                      --}}
+    {{-- ========================================================= --}}
+    <style>
+        /* Sembunyikan caption (nama & ukuran file) di Trix Editor */
+        .trix-content .attachment__caption {
+            display: none;
+        }
+    </style>
 </head>
 
 <body class="font-inter antialiased bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400"

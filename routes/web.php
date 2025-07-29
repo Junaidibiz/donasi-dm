@@ -7,6 +7,7 @@ use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExpenseReportController; // Pastikan ini di-import
 use App\Http\Controllers\TrixUploadController;
 
 /*
@@ -42,7 +43,6 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     });
 
     // --- Route untuk Slider ---
-    // Karena kita hanya butuh beberapa method, kita gunakan ->only()
     Route::resource('/slider', SliderController::class)->only([
         'index',    // GET /slider
         'create',   // GET /slider/create
@@ -50,15 +50,21 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         'destroy'   // DELETE /slider/{slider}
     ]);
 
-    // Route untuk menangani upload gambar Trix 
+    // Route untuk menangani upload gambar Trix (untuk Campaign)
     Route::post('/trix-upload', [TrixUploadController::class, 'store'])->name('trix.upload');
     Route::post('/trix-remove', [TrixUploadController::class, 'remove'])->name('trix.remove');
 
     // Route untuk Laporan Pengeluaran
-    Route::resource('expense-reports', App\Http\Controllers\ExpenseReportController::class);
+    Route::resource('expense-reports', ExpenseReportController::class);
+
+    // =============================================================
+    //          INI ADALAH RUTE BARU UNTUK UPLOAD GAMBAR
+    // =============================================================
+    Route::post('expense-reports/upload', [ExpenseReportController::class, 'upload'])->name('expense-reports.upload');
+    Route::delete('expense-reports/upload', [ExpenseReportController::class, 'removeUpload'])->name('expense-reports.removeUpload');
     
     // Fallback jika route tidak ditemukan
     Route::fallback(function() {
         return view('pages.utility.404');
-    });    
+    });     
 });

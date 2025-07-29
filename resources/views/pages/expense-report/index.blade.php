@@ -31,7 +31,7 @@
                                 <div class="font-semibold text-left">CAMPAIGN</div>
                             </th>
                             <th class="py-4 px-1 whitespace-nowrap">
-                                <div class="font-semibold text-left">DESKRIPSI</div>
+                                <div class="font-semibold text-left">JUDUL LAPORAN</div>
                             </th>
                             <th class="py-4 px-1 whitespace-nowrap">
                                 <div class="font-semibold text-left">JUMLAH</div>
@@ -53,7 +53,7 @@
                                         {{ $report->campaign->title }}</div>
                                 </td>
                                 <td class="p-2 px-1 whitespace-nowrap max-w-sm truncate">
-                                    <div>{{ Str::limit(strip_tags($report->description), 50) }}</div>
+                                    <div>{{ $report->title }}</div>
                                 </td>
                                 <td class="p-2 px-1 whitespace-nowrap">
                                     <div class="font-medium text-emerald-500">{{ moneyFormat($report->amount) }}</div>

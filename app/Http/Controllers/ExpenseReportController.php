@@ -1,11 +1,11 @@
 <?php
-// app/Http/Controllers/ExpenseReportController.php
 
 namespace App\Http\Controllers;
 
-use App\Models\Campaign; // <-- Tambahkan ini
+use App\Models\Campaign;
 use App\Models\ExpenseReport;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ExpenseReportController extends Controller
 {
@@ -15,40 +15,38 @@ class ExpenseReportController extends Controller
     public function index()
     {
         $expenseReports = ExpenseReport::with('campaign')->latest()->paginate(10);
-
         return view('pages.expense-report.index', compact('expenseReports'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create() // <-- Isi method ini
+    public function create()
     {
-        // Ambil semua campaign untuk ditampilkan di dropdown
         $campaigns = Campaign::orderBy('title')->get();
-
         return view('pages.expense-report.create', compact('campaigns'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-public function store(Request $request)
-{
-    // Validasi input
-    $validated = $request->validate([
-        'campaign_id' => 'required|exists:campaigns,id',
-        'description' => 'required|string', // <-- Perubahan di sini
-        'amount'      => 'required|integer|min:1',
-        'expense_date'=> 'required|date',
-    ]);
+    public function store(Request $request)
+    {
+        // =============================================
+        //              PERBAIKAN DI SINI
+        // =============================================
+        $validated = $request->validate([
+            'campaign_id' => 'required|exists:campaigns,id',
+            'title'       => 'required|string|max:255', // Pastikan title divalidasi
+            'description' => 'required|string',
+            'amount'      => 'required|integer|min:1',
+            'expense_date'=> 'required|date',
+        ]);
 
-    // Buat dan simpan data baru
-    ExpenseReport::create($validated);
+        ExpenseReport::create($validated);
 
-    // Redirect kembali ke halaman index dengan pesan sukses
-    return redirect()->route('expense-reports.index')->with('success', 'Laporan pengeluaran berhasil ditambahkan.');
-}
+        return redirect()->route('expense-reports.index')->with('success', 'Laporan pengeluaran berhasil ditambahkan.');
+    }
 
     /**
      * Display the specified resource.
@@ -63,10 +61,7 @@ public function store(Request $request)
      */
     public function edit(ExpenseReport $expenseReport)
     {
-        // Ambil semua campaign untuk dropdown
         $campaigns = Campaign::orderBy('title')->get();
-
-        // Tampilkan view edit dengan data laporan dan data campaign
         return view('pages.expense-report.edit', compact('expenseReport', 'campaigns'));
     }
 
@@ -75,18 +70,19 @@ public function store(Request $request)
      */
     public function update(Request $request, ExpenseReport $expenseReport)
     {
-        // Validasi input
+        // =============================================
+        //              PERBAIKAN DI SINI
+        // =============================================
         $validated = $request->validate([
             'campaign_id' => 'required|exists:campaigns,id',
+            'title'       => 'required|string|max:255', // Pastikan title divalidasi
             'description' => 'required|string',
             'amount'      => 'required|integer|min:1',
             'expense_date'=> 'required|date',
         ]);
 
-        // Update data laporan
         $expenseReport->update($validated);
 
-        // Redirect kembali ke halaman index dengan pesan sukses
         return redirect()->route('expense-reports.index')->with('success', 'Laporan pengeluaran berhasil diupdate.');
     }
 
@@ -96,7 +92,43 @@ public function store(Request $request)
     public function destroy(ExpenseReport $expenseReport)
     {
         $expenseReport->delete();
-
         return redirect()->route('expense-reports.index')->with('success', 'Laporan berhasil dihapus.');
+    }
+    
+    /**
+     * Method untuk menangani upload file dari Trix Editor.
+     */
+    public function upload(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($request->hasFile('file')) {
+            $path = $request->file('file')->store('public/expense-reports');
+            $url = Storage::url($path);
+            return response()->json(['url' => $url]);
+        }
+
+        return response()->json(['error' => 'Upload failed.'], 400);
+    }
+
+    /**
+     * Method untuk menghapus file yang di-upload dari Trix Editor.
+     */
+    public function removeUpload(Request $request)
+    {
+        $request->validate([
+            'url' => 'required|string',
+        ]);
+
+        $path = str_replace('/storage', 'public', parse_url($request->url, PHP_URL_PATH));
+        
+        if (Storage::exists($path)) {
+            Storage::delete($path);
+            return response()->json(['status' => 'success']);
+        }
+
+        return response()->json(['status' => 'error', 'message' => 'File not found.'], 404);
     }
 }

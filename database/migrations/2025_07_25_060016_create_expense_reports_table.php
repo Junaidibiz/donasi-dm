@@ -14,6 +14,12 @@ return new class extends Migration
         Schema::create('expense_reports', function (Blueprint $table) {
             $table->id();
             $table->foreignId('campaign_id')->constrained('campaigns')->onDelete('cascade');
+            
+            // ===================================
+            //    TAMBAHKAN KOLOM TITLE DI SINI
+            // ===================================
+            $table->string('title');
+
             $table->text('description');
             $table->bigInteger('amount');
             $table->date('expense_date');

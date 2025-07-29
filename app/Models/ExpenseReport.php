@@ -1,5 +1,4 @@
 <?php
-// app/Models/ExpenseReport.php
 
 namespace App\Models;
 
@@ -13,20 +12,16 @@ class ExpenseReport extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $fillable = [
         'campaign_id',
+        'title',        // <-- PASTIKAN BARIS INI ADA
         'description',
         'amount',
         'expense_date',
     ];
 
-    /**
-     * Get the campaign that owns the ExpenseReport
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function campaign()
     {
         return $this->belongsTo(Campaign::class);

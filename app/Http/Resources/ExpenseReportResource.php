@@ -16,6 +16,11 @@ class ExpenseReportResource extends JsonResource
     {
         return [
             'id'           => $this->id,
+            // =============================================
+            //          TAMBAHKAN BARIS INI
+            // =============================================
+            'title'        => $this->title,
+            
             'description'  => $this->description,
             'amount'       => (int) $this->amount,
             'expense_date' => $this->expense_date,
