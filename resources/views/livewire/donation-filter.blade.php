@@ -26,7 +26,7 @@
         </div>
 
         {{-- Input Tanggal Awal --}}
-        <div>
+        <div wire:ignore>
             <x-label for="date_from">DARI TANGGAL</x-label>
             <div class="relative">
                 <input class="datepicker form-input pl-9 dark:bg-gray-800 w-full" type="text" name="date_from"
@@ -43,7 +43,7 @@
         </div>
 
         {{-- Input Tanggal Akhir --}}
-        <div>
+        <div wire:ignore>
             <x-label for="date_to">SAMPAI TANGGAL</x-label>
             <div class="relative">
                 <input class="datepicker form-input pl-9 dark:bg-gray-800 w-full" type="text" name="date_to"

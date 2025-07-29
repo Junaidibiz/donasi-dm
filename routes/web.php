@@ -53,6 +53,9 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     // Route untuk menangani upload gambar Trix 
     Route::post('/trix-upload', [TrixUploadController::class, 'store'])->name('trix.upload');
     Route::post('/trix-remove', [TrixUploadController::class, 'remove'])->name('trix.remove');
+
+    // Route untuk Laporan Pengeluaran
+    Route::resource('expense-reports', App\Http\Controllers\ExpenseReportController::class);
     
     // Fallback jika route tidak ditemukan
     Route::fallback(function() {

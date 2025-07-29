@@ -9,51 +9,38 @@ use Illuminate\Support\Facades\Storage;
 
 class Campaign extends Model
 {
-    /**
-     * Atribut yang dapat diisi secara massal.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'title', 'slug', 'category_id', 'target_donation', 'max_date', 'description', 'image', 'user_id',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'max_date' => 'date',
     ];
 
     /**
-     * Mendefinisikan relasi ke model Category.
+     * Accessor untuk mendapatkan URL gambar yang valid.
+     * Ini adalah cara yang benar dan akan selalu menghasilkan URL lengkap.
      */
+    public function getImageAttribute($value): string
+    {
+        return url('storage/campaigns/' . $value);
+    }
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
-    /**
-     * Mendefinisikan relasi ke model User.
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Mendefinisikan relasi ke model Donation.
-     */
     public function donations(): HasMany
     {
         return $this->hasMany(Donation::class);
     }
 
-    /**
-     * Relasi untuk menjumlahkan donasi yang sukses.
-     */
     public function sumDonation(): HasMany
     {
         return $this->hasMany(Donation::class)
@@ -62,15 +49,8 @@ class Campaign extends Model
             ->groupBy('donations.campaign_id');
     }
 
-    /**
-     * Accessor untuk mendapatkan URL gambar yang valid.
-     */
-    public function getImageAttribute(): string
+    public function expenseReports(): HasMany
     {
-        if ($this->attributes['image'] && Storage::disk('public')->exists('campaigns/' . $this->attributes['image'])) {
-            return Storage::url('campaigns/' . $this->attributes['image']);
-        }
-        
-        return 'https://via.placeholder.com/800x400';
+        return $this->hasMany(ExpenseReport::class);
     }
 }
