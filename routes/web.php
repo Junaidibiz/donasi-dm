@@ -1,14 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PrayerController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\DonaturController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ExpenseReportController; // Pastikan ini di-import
 use App\Http\Controllers\TrixUploadController;
+use App\Http\Controllers\ExpenseReportController; // Pastikan ini di-import
 
 /*
 |--------------------------------------------------------------------------
@@ -63,6 +64,9 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('expense-reports/upload', [ExpenseReportController::class, 'upload'])->name('expense-reports.upload');
     Route::delete('expense-reports/upload', [ExpenseReportController::class, 'removeUpload'])->name('expense-reports.removeUpload');
     
+    Route::get('/prayers', [PrayerController::class, 'index'])->name('prayers.index');
+    Route::put('/prayers/{donation}', [PrayerController::class, 'update'])->name('prayers.update');
+
     // Fallback jika route tidak ditemukan
     Route::fallback(function() {
         return view('pages.utility.404');
