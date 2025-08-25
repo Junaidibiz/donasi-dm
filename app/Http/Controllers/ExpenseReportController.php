@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\ExpenseReport;
 use Illuminate\Http\Request;
 use App\Exports\ExpenseReportExport;
+use Illuminate\Support\Facades\Auth; // <-- Tambahkan ini di atas
 use Maatwebsite\Excel\Facades\Excel;
 
 class ExpenseReportController extends Controller
@@ -22,7 +23,7 @@ class ExpenseReportController extends Controller
         // Terapkan filter campaign jika ada
         if ($request->filled('campaign_id')) {
             $query->where('campaign_id', $request->campaign_id);
-        } 
+        }
         // Jika tidak ada campaign, filter berdasarkan kategori
         elseif ($request->filled('category_id')) {
             $query->whereHas('campaign', function ($q) use ($request) {
@@ -39,7 +40,7 @@ class ExpenseReportController extends Controller
 
         // Ambil data untuk dropdown filter
         $categories = Category::orderBy('name')->get();
-        
+
         // Ambil campaign berdasarkan kategori yang dipilih, atau semua campaign jika tidak ada
         $campaigns = $request->filled('category_id')
             ? Campaign::where('category_id', $request->category_id)->orderBy('title')->get()
@@ -62,16 +63,31 @@ class ExpenseReportController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        // Validasi field-field dari form
+        $request->validate([
             'campaign_id' => 'required|exists:campaigns,id',
+            'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'amount'      => 'required|integer|min:1',
-            'expense_date'=> 'required|date',
+            'amount' => 'required|numeric|min:0',
+            'expense_date' => 'required|date',
         ]);
 
-        ExpenseReport::create($validated);
+        // Mengambil campaign berdasarkan ID
+        $campaign = Campaign::find($request->campaign_id);
 
-        return redirect()->route('expense-reports.index')->with('success', 'Laporan pengeluaran berhasil ditambahkan.');
+        // Membuat laporan pengeluaran yang berelasi dengan campaign tersebut
+        $campaign->expenseReports()->create([
+            'title' => $request->title,
+            'body' => $request->description, // field 'description' disimpan ke kolom 'body'
+            'amount' => $request->amount,
+            'expense_date' => $request->expense_date,
+            // =========================================================
+            // PERBAIKAN FINAL: Menggunakan Fasad Auth yang eksplisit
+            // =========================================================
+            'user_id' => Auth::id(),
+        ]);
+
+        return redirect()->route('expense-reports.index')->with('success', 'Laporan pengeluaran berhasil dibuat.');
     }
 
     /**
@@ -88,16 +104,23 @@ class ExpenseReportController extends Controller
      */
     public function update(Request $request, ExpenseReport $expenseReport)
     {
-        $validated = $request->validate([
+        $request->validate([
             'campaign_id' => 'required|exists:campaigns,id',
+            'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'amount'      => 'required|integer|min:1',
-            'expense_date'=> 'required|date',
+            'amount' => 'required|numeric|min:0',
+            'expense_date' => 'required|date',
         ]);
 
-        $expenseReport->update($validated);
+        $expenseReport->update([
+            'campaign_id' => $request->campaign_id,
+            'title' => $request->title,
+            'body' => $request->description,
+            'amount' => $request->amount,
+            'expense_date' => $request->expense_date,
+        ]);
 
-        return redirect()->route('expense-reports.index')->with('success', 'Laporan pengeluaran berhasil diupdate.');
+        return redirect()->route('expense-reports.index')->with('success', 'Laporan pengeluaran berhasil diperbarui.');
     }
 
     /**
@@ -108,14 +131,14 @@ class ExpenseReportController extends Controller
         $expenseReport->delete();
         return redirect()->route('expense-reports.index')->with('success', 'Laporan berhasil dihapus.');
     }
-    
+
     /**
      * Mengekspor data laporan ke file Excel.
      */
     public function exportExcel(Request $request)
     {
+        // ... (kode export tidak perlu diubah)
         $query = ExpenseReport::with('campaign.category')->latest();
-
         if ($request->filled('campaign_id')) {
             $query->where('campaign_id', $request->campaign_id);
         } elseif ($request->filled('category_id')) {
@@ -123,17 +146,11 @@ class ExpenseReportController extends Controller
                 $q->where('category_id', $request->category_id);
             });
         }
-
         if ($request->filled('date_from') && $request->filled('date_to')) {
             $query->whereBetween('expense_date', [$request->date_from, $request->date_to]);
         }
-
         $expenseReports = $query->get();
-        $date_from = $request->date_from;
-        $date_to = $request->date_to;
-
-        $export = new ExpenseReportExport($expenseReports, $date_from, $date_to);
-
+        $export = new ExpenseReportExport($expenseReports, $request->date_from, $request->date_to);
         return Excel::download($export, 'laporan-pengeluaran.xlsx');
     }
 
@@ -142,8 +159,8 @@ class ExpenseReportController extends Controller
      */
     public function exportPdf(Request $request)
     {
+        // ... (kode export tidak perlu diubah)
         $query = ExpenseReport::with('campaign.category')->latest();
-
         if ($request->filled('campaign_id')) {
             $query->where('campaign_id', $request->campaign_id);
         } elseif ($request->filled('category_id')) {
@@ -151,17 +168,11 @@ class ExpenseReportController extends Controller
                 $q->where('category_id', $request->category_id);
             });
         }
-
         if ($request->filled('date_from') && $request->filled('date_to')) {
             $query->whereBetween('expense_date', [$request->date_from, $request->date_to]);
         }
-
         $expenseReports = $query->get();
-        $date_from = $request->date_from;
-        $date_to = $request->date_to;
-
-        $export = new ExpenseReportExport($expenseReports, $date_from, $date_to);
-
+        $export = new ExpenseReportExport($expenseReports, $request->date_from, $request->date_to);
         return Excel::download($export, 'laporan-pengeluaran.pdf', \Maatwebsite\Excel\Excel::DOMPDF);
     }
 }

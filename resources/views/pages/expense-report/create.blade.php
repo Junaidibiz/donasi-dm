@@ -21,7 +21,6 @@
                         @enderror
                     </div>
 
-                    {{-- Menambahkan field title --}}
                     <div>
                         <x-label for="title">Judul Laporan <span class="text-rose-500">*</span></x-label>
                         <x-input id="title" class="w-full" type="text" name="title" :value="old('title')"
@@ -66,16 +65,16 @@
         </div>
     </div>
 
-    {{-- ========================================================= --}}
-    {{--    SCRIPT UNTUK UPLOAD GAMBAR DARI TRIX EDITOR            --}}
-    {{-- ========================================================= --}}
     @push('scripts')
         <script>
             document.addEventListener('trix-attachment-add', function(event) {
                 const data = new FormData();
                 data.append('file', event.attachment.file);
 
-                fetch('{{ route('expense-reports.upload') }}', {
+                // =========================================================
+                // PERBAIKAN 1: Menggunakan route 'trix.upload' yang benar
+                // =========================================================
+                fetch('{{ route('trix.upload') }}', {
                         method: 'POST',
                         body: data,
                         headers: {
@@ -96,15 +95,24 @@
             });
 
             document.addEventListener('trix-attachment-remove', function(event) {
-                const url = event.attachment.attachment.attributes.values.url;
+                // =========================================================
+                // PERBAIKAN 2: Menggunakan cara yang benar untuk mendapatkan URL
+                // =========================================================
+                const fileUrl = event.attachment.getAttributes().url;
+                if (!fileUrl) {
+                    return;
+                }
 
-                fetch('{{ route('expense-reports.removeUpload') }}', {
-                        method: 'DELETE',
-                        body: JSON.stringify({
-                            url: url
-                        }),
+                const data = new FormData();
+                data.append('fileUrl', fileUrl);
+
+                // =========================================================
+                // PERBAIKAN 3: Menggunakan route 'trix.remove' & method 'POST'
+                // =========================================================
+                fetch('{{ route('trix.remove') }}', {
+                        method: 'POST',
+                        body: data,
                         headers: {
-                            'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         }
                     })
