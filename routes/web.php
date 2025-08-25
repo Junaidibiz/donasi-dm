@@ -1,15 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PrayerController;
-use App\Http\Controllers\SliderController;
-use App\Http\Controllers\DonaturController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\DonationController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DonationController;
+use App\Http\Controllers\DonaturController;
+use App\Http\Controllers\ExpenseReportController;
+use App\Http\Controllers\PrayerController;
+use App\Http\Controllers\SliderController;
 use App\Http\Controllers\TrixUploadController;
-use App\Http\Controllers\ExpenseReportController; // Pastikan ini di-import
 
 /*
 |--------------------------------------------------------------------------
@@ -17,55 +17,53 @@ use App\Http\Controllers\ExpenseReportController; // Pastikan ini di-import
 |--------------------------------------------------------------------------
 */
 
-// Arahkan halaman utama ke login
-Route::redirect('/', 'login');
+// Arahkan halaman utama ke halaman login
+Route::get('/', function () {
+    return view('auth.login');
+});
 
 // Grup untuk semua route yang memerlukan login
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     
-    // Route untuk Dashboard
+    // --- UTAMA ---
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Route Resource untuk Category
+    // --- MASTER DATA ---
     Route::resource('category', CategoryController::class);
-    
-    // Route Resource untuk Campaign
     Route::resource('campaign', CampaignController::class);
+    Route::resource('slider', SliderController::class)->except(['show']);
+    Route::get('donatur', [DonaturController::class, 'index'])->name('donatur.index');
+    Route::get('prayers', [PrayerController::class, 'index'])->name('prayers.index');
+    Route::put('prayers/{donation}', [PrayerController::class, 'update'])->name('prayers.update');
 
-    // Route untuk Donatur 
-    Route::get('/donatur', [DonaturController::class, 'index'])->name('donatur.index');
+    // --- LAPORAN ---
 
-    // --- Routes untuk Laporan Donasi ---
+    // Laporan Donasi
     Route::prefix('donation')->as('donation.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\DonationController::class, 'index'])->name('index');
-        Route::get('/filter', [\App\Http\Controllers\DonationController::class, 'filter'])->name('filter');
-        Route::get('/export/excel', [\App\Http\Controllers\DonationController::class, 'exportExcel'])->name('export.excel');
-        Route::get('/export/pdf', [\App\Http\Controllers\DonationController::class, 'exportPdf'])->name('export.pdf');
+        Route::get('/', [DonationController::class, 'index'])->name('index');
+        Route::get('export/excel', [DonationController::class, 'exportExcel'])->name('export.excel');
+        Route::get('export/pdf', [DonationController::class, 'exportPdf'])->name('export.pdf');
     });
 
-    // --- Route untuk Slider ---
-    Route::resource('/slider', SliderController::class)->only([
-        'index',    // GET /slider
-        'create',   // GET /slider/create
-        'store',    // POST /slider
-        'destroy'   // DELETE /slider/{slider}
-    ]);
+    // Laporan Pengeluaran
+    Route::prefix('expense-reports')->as('expense-reports.')->group(function () {
+        Route::get('/', [ExpenseReportController::class, 'index'])->name('index');
+        Route::get('/create', [ExpenseReportController::class, 'create'])->name('create');
+        Route::post('/', [ExpenseReportController::class, 'store'])->name('store');
+        Route::get('/{expenseReport}/edit', [ExpenseReportController::class, 'edit'])->name('edit');
+        Route::put('/{expenseReport}', [ExpenseReportController::class, 'update'])->name('update');
+        Route::delete('/{expenseReport}', [ExpenseReportController::class, 'destroy'])->name('destroy');
+        
+        // Rute untuk Export
+        Route::get('export/excel', [ExpenseReportController::class, 'exportExcel'])->name('excel');
+        Route::get('export/pdf', [ExpenseReportController::class, 'exportPdf'])->name('pdf');
+    });
 
-    // Route untuk menangani upload gambar Trix (untuk Campaign)
+    // --- UTILITAS ---
+
+    // Route umum untuk menangani upload gambar dari Trix Editor
     Route::post('/trix-upload', [TrixUploadController::class, 'store'])->name('trix.upload');
     Route::post('/trix-remove', [TrixUploadController::class, 'remove'])->name('trix.remove');
-
-    // Route untuk Laporan Pengeluaran
-    Route::resource('expense-reports', ExpenseReportController::class);
-
-    // =============================================================
-    //          INI ADALAH RUTE BARU UNTUK UPLOAD GAMBAR
-    // =============================================================
-    Route::post('expense-reports/upload', [ExpenseReportController::class, 'upload'])->name('expense-reports.upload');
-    Route::delete('expense-reports/upload', [ExpenseReportController::class, 'removeUpload'])->name('expense-reports.removeUpload');
-    
-    Route::get('/prayers', [PrayerController::class, 'index'])->name('prayers.index');
-    Route::put('/prayers/{donation}', [PrayerController::class, 'update'])->name('prayers.update');
 
     // Fallback jika route tidak ditemukan
     Route::fallback(function() {

@@ -3,23 +3,53 @@
 namespace App\Http\Controllers;
 
 use App\Models\Campaign;
+use App\Models\Category;
 use App\Models\ExpenseReport;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\Exports\ExpenseReportExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ExpenseReportController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Menampilkan daftar resource dengan filter.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $expenseReports = ExpenseReport::with('campaign')->latest()->paginate(10);
-        return view('pages.expense-report.index', compact('expenseReports'));
+        // Query dasar untuk laporan pengeluaran
+        $query = ExpenseReport::with('campaign.category')->latest();
+
+        // Terapkan filter campaign jika ada
+        if ($request->filled('campaign_id')) {
+            $query->where('campaign_id', $request->campaign_id);
+        } 
+        // Jika tidak ada campaign, filter berdasarkan kategori
+        elseif ($request->filled('category_id')) {
+            $query->whereHas('campaign', function ($q) use ($request) {
+                $q->where('category_id', $request->category_id);
+            });
+        }
+
+        // Terapkan filter tanggal
+        if ($request->filled('date_from') && $request->filled('date_to')) {
+            $query->whereBetween('expense_date', [$request->date_from, $request->date_to]);
+        }
+
+        $expenseReports = $query->paginate(10)->withQueryString();
+
+        // Ambil data untuk dropdown filter
+        $categories = Category::orderBy('name')->get();
+        
+        // Ambil campaign berdasarkan kategori yang dipilih, atau semua campaign jika tidak ada
+        $campaigns = $request->filled('category_id')
+            ? Campaign::where('category_id', $request->category_id)->orderBy('title')->get()
+            : Campaign::orderBy('title')->get();
+
+        return view('pages.expense-report.index', compact('expenseReports', 'categories', 'campaigns'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Menampilkan form untuk membuat resource baru.
      */
     public function create()
     {
@@ -28,16 +58,12 @@ class ExpenseReportController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Menyimpan resource baru ke storage.
      */
     public function store(Request $request)
     {
-        // =============================================
-        //              PERBAIKAN DI SINI
-        // =============================================
         $validated = $request->validate([
             'campaign_id' => 'required|exists:campaigns,id',
-            'title'       => 'required|string|max:255', // Pastikan title divalidasi
             'description' => 'required|string',
             'amount'      => 'required|integer|min:1',
             'expense_date'=> 'required|date',
@@ -49,15 +75,7 @@ class ExpenseReportController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(ExpenseReport $expenseReport)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
+     * Menampilkan form untuk mengedit resource.
      */
     public function edit(ExpenseReport $expenseReport)
     {
@@ -66,16 +84,12 @@ class ExpenseReportController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Memperbarui resource di storage.
      */
     public function update(Request $request, ExpenseReport $expenseReport)
     {
-        // =============================================
-        //              PERBAIKAN DI SINI
-        // =============================================
         $validated = $request->validate([
             'campaign_id' => 'required|exists:campaigns,id',
-            'title'       => 'required|string|max:255', // Pastikan title divalidasi
             'description' => 'required|string',
             'amount'      => 'required|integer|min:1',
             'expense_date'=> 'required|date',
@@ -87,7 +101,7 @@ class ExpenseReportController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Menghapus resource dari storage.
      */
     public function destroy(ExpenseReport $expenseReport)
     {
@@ -96,39 +110,58 @@ class ExpenseReportController extends Controller
     }
     
     /**
-     * Method untuk menangani upload file dari Trix Editor.
+     * Mengekspor data laporan ke file Excel.
      */
-    public function upload(Request $request)
+    public function exportExcel(Request $request)
     {
-        $request->validate([
-            'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        $query = ExpenseReport::with('campaign.category')->latest();
 
-        if ($request->hasFile('file')) {
-            $path = $request->file('file')->store('public/expense-reports');
-            $url = Storage::url($path);
-            return response()->json(['url' => $url]);
+        if ($request->filled('campaign_id')) {
+            $query->where('campaign_id', $request->campaign_id);
+        } elseif ($request->filled('category_id')) {
+            $query->whereHas('campaign', function ($q) use ($request) {
+                $q->where('category_id', $request->category_id);
+            });
         }
 
-        return response()->json(['error' => 'Upload failed.'], 400);
+        if ($request->filled('date_from') && $request->filled('date_to')) {
+            $query->whereBetween('expense_date', [$request->date_from, $request->date_to]);
+        }
+
+        $expenseReports = $query->get();
+        $date_from = $request->date_from;
+        $date_to = $request->date_to;
+
+        $export = new ExpenseReportExport($expenseReports, $date_from, $date_to);
+
+        return Excel::download($export, 'laporan-pengeluaran.xlsx');
     }
 
     /**
-     * Method untuk menghapus file yang di-upload dari Trix Editor.
+     * Mengekspor data laporan ke file PDF.
      */
-    public function removeUpload(Request $request)
+    public function exportPdf(Request $request)
     {
-        $request->validate([
-            'url' => 'required|string',
-        ]);
+        $query = ExpenseReport::with('campaign.category')->latest();
 
-        $path = str_replace('/storage', 'public', parse_url($request->url, PHP_URL_PATH));
-        
-        if (Storage::exists($path)) {
-            Storage::delete($path);
-            return response()->json(['status' => 'success']);
+        if ($request->filled('campaign_id')) {
+            $query->where('campaign_id', $request->campaign_id);
+        } elseif ($request->filled('category_id')) {
+            $query->whereHas('campaign', function ($q) use ($request) {
+                $q->where('category_id', $request->category_id);
+            });
         }
 
-        return response()->json(['status' => 'error', 'message' => 'File not found.'], 404);
+        if ($request->filled('date_from') && $request->filled('date_to')) {
+            $query->whereBetween('expense_date', [$request->date_from, $request->date_to]);
+        }
+
+        $expenseReports = $query->get();
+        $date_from = $request->date_from;
+        $date_to = $request->date_to;
+
+        $export = new ExpenseReportExport($expenseReports, $date_from, $date_to);
+
+        return Excel::download($export, 'laporan-pengeluaran.pdf', \Maatwebsite\Excel\Excel::DOMPDF);
     }
 }
